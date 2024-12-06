@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.pizza.Dao.ItemsDAO"> 
+	<select id="getAllItems" resultType="java.util.Map"> 
+		SELECT 
+            *
+		FROM 
+            items i
+        JOIN 
+            item_detail id ON i.item_id = id.item_id
+        JOIN 
+            details d ON id.detail_id = d.detail_id
+	</select>
+
+    <select id="getItemsById" resultType="java.util.Map">
+        SELECT 
+            i.item_id,
+            i.name,
+            i.description,
+            i.image,
+            i.price,
+            id.detail_id,
+            d.title
+        FROM 
+            items i
+        JOIN 
+            item_detail id ON i.item_id = id.item_id
+        JOIN 
+            details d ON id.detail_id = d.detail_id
+        WHERE 
+            i.item_id = #{item_id}
+    </select>
+    
+    <insert id="insertItems" parameterType="com.example.pizza.Entity.Items" useGeneratedKeys="true" keyProperty="item_id">
+    <!-- 插入 items 表 -->
+        INSERT INTO items (name, description, image, price)
+        VALUES (#{name}, #{description}, #{image}, #{price});
+    </insert>
+
+    <!-- 插入 details 表 -->
+    <insert id="insertDetails" parameterType="com.example.pizza.Entity.Items" useGeneratedKeys="true" keyProperty="detail_id">
+        INSERT INTO details (title)
+        VALUES (#{title});
+    </insert>
+
+    <!-- 插入 item_detail 表，使用 LAST_INSERT_ID() 取得剛插入的 detail_id -->
+    <insert id="insertItemDetail" parameterType="com.example.pizza.Entity.Items">
+        INSERT INTO item_detail (item_id, detail_id)
+        VALUES (#{item_id}, #{detail_id});
+    </insert>
+
+
+    <update id="updateItems" parameterType="com.example.pizza.Entity.Items">
+        UPDATE items
+        SET
+            name = #{name},
+            description = #{description},
+            image = #{image},
+            price = #{price}
+        WHERE item_id = #{item_id}
+    </update>
+
+    <delete id="deleteItemsById" parameterType="java.lang.Long">
+        DELETE FROM items WHERE item_id = #{item_id};
+    </delete>
+
+    <delete id="deleteItemDetailByItemId" parameterType="java.lang.Long">
+        DELETE FROM item_detail WHERE item_id = #{item_id};
+    </delete>
+
+</mapper>
